@@ -1,4 +1,4 @@
-#
+o#
 # error Function
 #
 
@@ -18,12 +18,12 @@ function is_error {
 # prepare env (keypairs,rules..) Functions
 #
 function create_keypair {
-  
+  echo -n "Create a key-pair"
   aws ec2 create-key-pair --key-name keypair --query 'KeyMaterial' --output text > keypair.pem 2> error.log
   is_error $?
   #CHange access permissions to keypair for security 
   chmod 400 keypair.pem
-  
+  echo "Done!"
   
 }
 
