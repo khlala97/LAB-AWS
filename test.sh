@@ -27,6 +27,25 @@ function create_keypair {
   
 }
 
+function create_security_group {
+    echo "Create security group..."
+    SECURITY_GROUP_ID=$(aws ec2 create-security-group \
+    --group-name benchmarking-security-group \
+    --description 'Security group for benchmarking lab' \
+    --query 'GroupId'\
+    --output text)
+
+    echo "SECURITY_GROUP_ID=\"$SECURITY_GROUP_ID\"" >> env.txt
+
+    add_security_ingress_rules '[{"IpProtocol": "tcp", "FromPort": 22, "ToPort": 22, "IpRanges": [{"CidrIp": "0.0.0.0/0", "Description": "Allow SSH"}]},{"IpProtocol": "tcp", "FromPort": 80, "ToPort": 80, "IpRanges": [{"CidrIp": "0.0.0.0/0", "Description": "Allow HTTP"}]}]' > /dev/null 2> error.log
+    echo "Done"
+}
+
+function add_security_ingress_rules {
+    echo "Add ingress rules"
+    local rules_permissions=$1
+    aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --ip-permissions "${rules_permissions}"
+}
 #
 # deployement Function
 #
