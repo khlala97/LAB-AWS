@@ -17,8 +17,14 @@ function is_error {
 #
 # prepare env (keypairs,rules..) Functions
 #
-function env {
-
+function create_keypair {
+  
+  aws ec2 create-key-pair --key-name keypair --query 'KeyMaterial' --output text > keypair.pem 2> error.log
+  is_error $?
+  #CHange access permissions to keypair for security 
+  chmod 400 keypair.pem
+  
+  
 }
 
 #
