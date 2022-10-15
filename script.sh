@@ -1,6 +1,6 @@
 set -e
 # import cli cmd functions
-source test.sh
+source cli_helper.sh
 
 function setup {
   create_security_groupe
@@ -12,6 +12,14 @@ function setup {
   CLUSTER_ONE_INSTANCES=()
   CLUSTER_TWO_INSTANCES=()
   
-  
+  echo "Launch EC2 instances... "
+  for i in {1..4}; do
+    CLUSTER_ONE_INSTANCES+=("$(launch_ec2_instance $SUBNETS_1 "t2.large")")
+    CLUSTER_TWO_INSTANCES+=("$(launch_ec2_instance $SUBNETS_2 "m4.large")")
+  done
+  #Launch the 9th instance
+  CLUSTER_ONE_INSTANCES+=("$(launch_ec2_instance $SUBNETS_1 "t2.large")")
+  echo "Done"
+
   
 }
