@@ -1,8 +1,17 @@
 #
 # error Function
 #
-function error {
+
+set -e
+action =$1
+function is_error {
+  EXIT_CODE=$1
   
+  if [[ $EXITE_CODE != 0 ]]; then
+    echo "Error!"
+    echo "Check error.log file"
+    exit
+  fi
 }
 
 #
