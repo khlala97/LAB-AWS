@@ -23,3 +23,18 @@ function setup {
 
   
 }
+#Setup the load balancer configs
+echo "Create an application load balancer... "
+ALB_ARN=$(create_alb)
+echo "Done"
+
+echo "Create target groups"
+ALB_TARGET_GROUP1_ARN=$(create_target_group "cluster1")
+ALB_TARGET_GROUP2_ARN=$(create_target_group "cluster2")
+echo "Done"
+
+echo -n "Wait for instances to enter 'running' state... "
+aws ec2 wait instance-running --instance-ids ${CLUSTER_ONE_INSTANCES[@]} ${CLUSTER_TWO_INSTANCES[@]}
+echo "Instances are ready!"
+
+
