@@ -80,6 +80,64 @@ function start_benchmarking {
     docker run --rm bench-script benchmarking $alb_dns
 }
 
+function visualization {
+    aws cloudwatch get-metric-widget-image --metric-widget '{
+        "metrics": [
+            [ "AWS/ApplicationELB", "RequestCount", "TargetGroup", "targetgroup/cluster1/'"${ALB_TARGET_GROUP1_ARN##*/}"'", "LoadBalancer", "app/application-load-balancer/'"${ALB_ARN##*/}"'", "AvailabilityZone", "us-east-1a" ],
+            [ "...", "targetgroup/cluster2/'"${ALB_TARGET_GROUP2_ARN##*/}"'", ".", ".", ".", "us-east-1b" ]
+        ],
+        "title": "Request Count",
+        "width": 1500,
+        "height": 250,
+        "start": "-PT30M"
+      }' --output text | base64 -d >|metrics/request_count.png
+
+    aws cloudwatch get-metric-widget-image --metric-widget '{
+      "metrics": [
+          [ "AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "app/application-load-balancer/'"${ALB_ARN##*/}"'", "AvailabilityZone", "us-east-1a" ],
+          [ "...", "us-east-1b" ]
+      ],
+      "title": "Target Response Time per AZ",
+      "width": 1500,
+      "height": 250,
+      "start": "-PT30M"
+     }' --output text | base64 -d >|metrics/target_response_time_AZ.png
+
+    aws cloudwatch get-metric-widget-image --metric-widget '{
+      "title": "Target Response Time per Group",
+      "metrics": [
+          [ "AWS/ApplicationELB", "TargetResponseTime", "TargetGroup", "targetgroup/cluster1/'"${ALB_TARGET_GROUP1_ARN##*/}"'", "LoadBalancer", "app/application-load-balancer/'"${ALB_ARN##*/}"'" ],
+          [ "...", "targetgroup/cluster2/'"${ALB_TARGET_GROUP2_ARN##*/}"'", ".", "." ]
+      ],
+      "width": 1500,
+      "height": 250,
+      "start": "-PT30M"
+      }' --output text | base64 -d >|metrics/target_response_time_TG.png
+
+    aws cloudwatch get-metric-widget-image --metric-widget '{
+        "title": "CPU utilizations (%)",
+        "metrics": [
+            [ "AWS/EC2", "CPUUtilization", "InstanceType", "m4.large" ],
+            [ "...", "t2.large" ]
+        ],
+        "width": 1500,
+        "height": 250,
+        "start": "-PT30M"
+      }' --output text | base64 -d >|metrics/cpuutilization.png
+
+    aws cloudwatch get-metric-widget-image --metric-widget '{
+        "title": "Network In",
+        "metrics": [
+            [ "AWS/EC2", "NetworkIn", "InstanceType", "m4.large" ],
+            [ "...", "t2.large" ]
+        ],
+        "width": 1500,
+        "height": 250,
+        "start": "-PT30M"
+      }' --output text | base64 -d >|metrics/networking.png
+
+}
+
 function wipe {
     ## Delete the listener
     if [[ -n "${ALB_LISTNER_ARN}" ]]; then
@@ -145,4 +203,5 @@ function wipe {
 
 setup
 start_benchmarking $ALB_DNS
-#wipe
+visualization
+wipe
