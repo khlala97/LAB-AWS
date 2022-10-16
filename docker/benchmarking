@@ -1,0 +1,55 @@
+#!/usr/bin/env python
+
+import requests
+import time
+import sys
+
+from threading import *
+
+base_url = f"http://{sys.argv[1]}"
+paths_to_test = ["/cluster1", "/cluster2"]
+
+
+def get_request(path):
+    try:
+        response = requests.get(base_url + path)
+        response.raise_for_status()
+        return response.content
+    except Exception as ex:
+        print(f"Failed to get response due to {ex}")
+
+
+def send_sequentially_requests(path):
+    cluster = split_string(path, 1)
+    print(f"sending 1000 Get requests on {cluster}.....")
+    for i in range(1000):
+        get_request(path)
+
+
+def send_delayed_requests(path):
+    cluster = split_string(path, 1)
+    print(f"sending the first 500 Get requests on {cluster}....")
+    for i in range(500):
+        get_request(path)
+
+    print(f"Waiting for 1 minute .....")
+    time.sleep(60)
+
+    send_sequentially_requests(path)
+
+
+def split_string(value, index):
+    return value.split("/")[index]
+
+
+for path in paths_to_test:
+    thread_list = []
+    print(f"################### Starting threads for {path} ###################")
+    thread_list.append(Thread(target=send_sequentially_requests, args=(path,)))
+    thread_list.append(Thread(target=send_delayed_requests, args=(path,)))
+    for thread in thread_list:
+        thread.start()
+
+    for thread in thread_list:
+        thread.join()
+    print("####################################################################\n")

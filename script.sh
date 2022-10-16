@@ -1,6 +1,6 @@
 set -e
 # import cli cmd functions
-source cli_helper.sh
+source utils/cli_helper.sh
 
 function setup {
 
@@ -70,3 +70,14 @@ function setup {
     echo "Setup completed"
 }
 
+function start_benchmarking {
+    local alb_dns=$1
+    cd docker
+    # Build a custom image to run the banchmark script
+    docker build -t bench-script .
+    # Run the banchmark script inside a docker container
+    docker run --rm bench-script benchmarking $alb_dns
+}
+
+setup
+start_benchmarking $ALB_DNS
