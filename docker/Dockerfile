@@ -1,3 +1,4 @@
+# Use python image as source of our custom image
 FROM python:latest
 
 # Setup
@@ -8,8 +9,10 @@ ENV SCRIPT_PATH /usr/local/bin/
 ENV PYTHONUNBUFFERED=1 
 
 # Needed dependencies
+# Copy the requirement file from the local to the container
 COPY requirements.txt /tmp/requirements.txt
+# Install python dependencies
 RUN pip --cache-dir /tmp/pip install -r /tmp/requirements.txt
 
-# Copy scripts
+# Copy script
 COPY benchmarking ${SCRIPT_PATH}

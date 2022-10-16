@@ -37,19 +37,25 @@ def send_delayed_requests(path):
 
     send_sequentially_requests(path)
 
-
+ 
 def split_string(value, index):
     return value.split("/")[index]
 
 
 for path in paths_to_test:
+    # Create a list for threads 
     thread_list = []
     print(f"################### Starting threads for {path} ###################")
+    # Create 2 thread :  one per scenario and add them to thread list
+    # Thread one: call send_sequentially_requests 
+    # Thread two: call send_delayed_requests
     thread_list.append(Thread(target=send_sequentially_requests, args=(path,)))
     thread_list.append(Thread(target=send_delayed_requests, args=(path,)))
+    # Start threads on parrellel
     for thread in thread_list:
         thread.start()
 
+    # Wait until thread completed the job before we start the next iteration
     for thread in thread_list:
         thread.join()
     print("####################################################################\n")
