@@ -79,5 +79,69 @@ function start_benchmarking {
     docker run --rm bench-script benchmarking $alb_dns
 }
 
+function wipe {
+    ## Delete the listener
+    if [[ -n "${ALB_LISTNER_ARN}" ]]; then
+        echo "Delete the listener... "
+        delete_listener $ALB_LISTNER_ARN
+        echo "Done"
+    fi
+
+    ## Deregister targets
+    if [[ -n "${ALB_TARGET_GROUP1_ARN}" ]] && [[ -n $CLUSTER_ONE_INSTANCES ]]; then
+        echo "Deregister targets... "
+        deregister_targets $ALB_TARGET_GROUP1_ARN $CLUSTER_ONE_INSTANCES
+        echo "done for cluster 1"
+    fi
+    if [[ -n "${ALB_TARGET_GROUP2_ARN}" ]] && [[ -n $CLUSTER_TWO_INSTANCES ]]; then
+        deregister_targets $ALB_TARGET_GROUP2_ARN $CLUSTER_TWO_INSTANCES
+        echo "done for cluster 2"
+    fi
+
+    ## Delete target groups
+    if [[ -n "${ALB_TARGET_GROUP1_ARN}" ]]; then
+        echo -n "Delete target groups... "
+        delete_target_groups $ALB_TARGET_GROUP1_ARN
+        echo "group deleted for cluster 1"
+    fi
+    if [[ -n "${ALB_TARGET_GROUP2_ARN}" ]]; then
+        delete_target_groups $ALB_TARGET_GROUP2_ARN
+        echo "group deleted for cluster 2"
+    fi
+
+    ## Delete Application Load Balancer
+    if [[ -n "${ALB_ARN}" ]]; then
+        echo "Delete Application Load Balancer... "
+        delete_alb $ALB_ARN
+        echo "Application Load Balancer deleted"
+    fi
+
+    ## Terminate the ec2 instances
+    if [[ -n "${CLUSTER_ONE_INSTANCES}" ]]; then
+        echo "Terminate the ec2 instances... Ok"
+        aws ec2 wait instance-running --instance-ids ${CLUSTER_ONE_INSTANCES[@]} ${CLUSTER_TWO_INSTANCES[@]}
+        aws ec2 terminate-instances --instance-ids ${CLUSTER_ONE_INSTANCES[@]} ${CLUSTER_TWO_INSTANCES[@]} &>/dev/null
+
+        ## Wait for instances to enter 'terminated' state
+        echo "Wait for instances to enter 'terminated' state... "
+        aws ec2 wait instance-terminated --instance-ids ${CLUSTER_ONE_INSTANCES[@]} ${CLUSTER_TWO_INSTANCES[@]}
+        echo "instance terminated"
+    fi
+
+    ## Delete key pair
+    echo "Delete key pair... "
+    aws ec2 delete-key-pair --key-name keypair
+    rm -f keypair.pem
+    echo "key pair Deleted"
+
+    ## Delete custom security group
+    if [[ -n "$SECURITY_GROUP_ID" ]]; then
+        echo "Delete custom security group... "
+        delete_security_group$SECURITY_GROUP_ID
+        echo "Security-group deleted"
+    fi
+}
+
 setup
 start_benchmarking $ALB_DNS
+#wipe
