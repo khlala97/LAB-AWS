@@ -43,7 +43,7 @@ function setup {
         register_targets $ALB_TARGET_GROUP1_ARN $id
     done
 
-    for id in ${AWS_CLUSTER_TWO_INSTANCES[@]}; do
+    for id in ${CLUSTER_TWO_INSTANCES[@]}; do
         register_targets $ALB_TARGET_GROUP2_ARN $id
     done
     echo "Success!"
