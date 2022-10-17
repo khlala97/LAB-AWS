@@ -97,6 +97,8 @@ function visualization {
     if [[ -f "backup.txt" ]]; then
         source backup.txt
     fi
+
+    # Get the number of request count by target group
     aws cloudwatch get-metric-widget-image --metric-widget '{
         "metrics": [
             [ "AWS/ApplicationELB", "RequestCount", "TargetGroup", "targetgroup/cluster1/'"${ALB_TARGET_GROUP1_ARN##*/}"'", "LoadBalancer", "app/application-load-balancer/'"${ALB_ARN##*/}"'", "AvailabilityZone", "us-east-1a" ],
@@ -105,20 +107,12 @@ function visualization {
         "title": "Request Count",
         "width": 1500,
         "height": 250,
-        "start": "-PT30M"
+        "start": "-PT30M",
+        "stat": "SampleCount",
+        "period": 60
       }' --output text | base64 -d >| app/static/metrics/request_count.png
 
-    aws cloudwatch get-metric-widget-image --metric-widget '{
-      "metrics": [
-          [ "AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "app/application-load-balancer/'"${ALB_ARN##*/}"'", "AvailabilityZone", "us-east-1a" ],
-          [ "...", "us-east-1b" ]
-      ],
-      "title": "Target Response Time per AZ",
-      "width": 1500,
-      "height": 250,
-      "start": "-PT30M"
-     }' --output text | base64 -d >|app/static/metrics/target_response_time_AZ.png
-
+    # Get the response time by targer group
     aws cloudwatch get-metric-widget-image --metric-widget '{
       "title": "Target Response Time per Group",
       "metrics": [
@@ -127,9 +121,12 @@ function visualization {
       ],
       "width": 1500,
       "height": 250,
-      "start": "-PT30M"
+      "start": "-PT30M",
+      "stat": "Sum",
+      "period": 60
       }' --output text | base64 -d >| app/static/metrics/target_response_time_TG.png
 
+    # Get the cpu usage by instance type
     aws cloudwatch get-metric-widget-image --metric-widget '{
         "title": "CPU utilizations (%)",
         "metrics": [
@@ -138,9 +135,11 @@ function visualization {
         ],
         "width": 1500,
         "height": 250,
-        "start": "-PT30M"
+        "start": "-PT30M",
+        "period": 60
       }' --output text | base64 -d >|app/static/metrics/cpuutilization.png
 
+    # Get the number of bytes received by instance type on all network interfaces
     aws cloudwatch get-metric-widget-image --metric-widget '{
         "title": "Network In",
         "metrics": [
@@ -149,7 +148,8 @@ function visualization {
         ],
         "width": 1500,
         "height": 250,
-        "start": "-PT30M"
+        "start": "-PT30M",
+        "period": 60
       }' --output text | base64 -d >| app/static/metrics/networking.png
 
     # Display collected metrcis in a html page using flask
@@ -207,10 +207,12 @@ function wipe {
     fi
 
     ## Delete key pair
-    echo "Delete key pair..."
-    aws ec2 delete-key-pair --key-name keypair
-    rm -f keypair.pem
-    echo "key pair Deleted"
+    if [[ -f "keypair.pem" ]]; then
+        echo "Delete key pair..."
+        aws ec2 delete-key-pair --key-name keypair
+        rm -f keypair.pem
+        echo "key pair Deleted"
+    fi    
 
     ## Delete custom security group
     if [[ -n "$SECURITY_GROUP_ID" ]]; then
