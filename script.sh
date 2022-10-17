@@ -198,7 +198,7 @@ function wipe {
     if [[ -n "${CLUSTER_ONE_INSTANCES}" ]]; then
         echo "Terminate the ec2 instances... Ok"
         aws ec2 wait instance-running --instance-ids ${CLUSTER_ONE_INSTANCES[@]} ${CLUSTER_TWO_INSTANCES[@]}
-        aws ec2 terminate-instances --instance-ids ${CLUSTER_ONE_INSTANCES[@]} ${CLUSTER_TWO_INSTANCES[@]} &>/dev/null
+        aws ec2 terminate-instances --instance-ids ${CLUSTER_ONE_INSTANCES[@]} ${CLUSTER_TWO_INSTANCES[@]}
 
         ## Wait for instances to enter 'terminated' state
         echo "Wait for instances to enter 'terminated' state..."
@@ -215,7 +215,7 @@ function wipe {
     ## Delete custom security group
     if [[ -n "$SECURITY_GROUP_ID" ]]; then
         echo "Delete custom security group..."
-        delete_security_group$SECURITY_GROUP_ID
+        delete_security_group $SECURITY_GROUP_ID
         echo "Security-group deleted"
     fi
 }
