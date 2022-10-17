@@ -19,6 +19,8 @@ For this lab we'll implement a main bash script that will has five functions
 
 * The fourth function will be in charge of wiping all the setup done in function one
 
+
+
 Below the final result as described in function 3:
 
 ![Alt text](/docs/demo.png?raw=true "Title") 
