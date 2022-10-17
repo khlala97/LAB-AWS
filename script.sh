@@ -90,7 +90,7 @@ function visualization {
         "width": 1500,
         "height": 250,
         "start": "-PT30M"
-      }' --output text | base64 -d >|metrics/request_count.png
+      }' --output text | base64 -d >|app/static/metrics/request_count.png
 
     aws cloudwatch get-metric-widget-image --metric-widget '{
       "metrics": [
@@ -101,7 +101,7 @@ function visualization {
       "width": 1500,
       "height": 250,
       "start": "-PT30M"
-     }' --output text | base64 -d >|metrics/target_response_time_AZ.png
+     }' --output text | base64 -d >|app/static/metrics/target_response_time_AZ.png
 
     aws cloudwatch get-metric-widget-image --metric-widget '{
       "title": "Target Response Time per Group",
@@ -112,7 +112,7 @@ function visualization {
       "width": 1500,
       "height": 250,
       "start": "-PT30M"
-      }' --output text | base64 -d >|metrics/target_response_time_TG.png
+      }' --output text | base64 -d >|app/static/metrics/target_response_time_TG.png
 
     aws cloudwatch get-metric-widget-image --metric-widget '{
         "title": "CPU utilizations (%)",
@@ -123,7 +123,7 @@ function visualization {
         "width": 1500,
         "height": 250,
         "start": "-PT30M"
-      }' --output text | base64 -d >|metrics/cpuutilization.png
+      }' --output text | base64 -d >|app/static/metrics/cpuutilization.png
 
     aws cloudwatch get-metric-widget-image --metric-widget '{
         "title": "Network In",
@@ -134,7 +134,10 @@ function visualization {
         "width": 1500,
         "height": 250,
         "start": "-PT30M"
-      }' --output text | base64 -d >|metrics/networking.png
+      }' --output text | base64 -d >|app/static/metrics/networking.png
+
+    # Display collected metrcis in a html page using flask
+    python3 app/app.py
 
 }
 
