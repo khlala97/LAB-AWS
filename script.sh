@@ -19,12 +19,14 @@ function setup {
 
     echo "Launch EC2 instances..."
     for i in {1..4}; do
-        CLUSTER_ONE_INSTANCES+=("$(launch_ec2_instance $SUBNETS_1 "t2.large")")
-        CLUSTER_TWO_INSTANCES+=("$(launch_ec2_instance $SUBNETS_2 "m4.large")")
+        t2 = $(launch_ec2_instance $SUBNETS_1 "t2.large")
+        m4 = $(launch_ec2_instance $SUBNETS_2 "m4.large")
+        CLUSTER_ONE_INSTANCES+=("$t2")
+        CLUSTER_TWO_INSTANCES+=("$m4")
     done
-    # a list per cluster that contain the ip of instances 
     #Launch the 9th instance
-    CLUSTER_ONE_INSTANCES+=("$(launch_ec2_instance $SUBNETS_1 "t2.large")")
+    t2 = $(launch_ec2_instance $SUBNETS_1 "t2.large")
+    CLUSTER_ONE_INSTANCES+=("$t2")
     echo "CLUSTER_ONE_INSTANCES=\"$CLUSTER_ONE_INSTANCES\"" >>backup.txt
     echo "CLUSTER_TWO_INSTANCES=\"$CLUSTER_TWO_INSTANCES\"" >>backup.txt
     echo "Done"
