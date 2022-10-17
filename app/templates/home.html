@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lab 1 demo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body>
+    <h1>Lab 1 - Cluster Benchmarking</h1>
+    &nbsp
+    &nbsp
+    &nbsp
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Instance Type</th>
+                <th>vCPUs </th>
+                <th>Memory (GiB) </th>
+                <th>Instance Numbers </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>t2.large</td>
+                <td>2</td>
+                <td>8</td>
+                <td>5</td>
+
+            </tr>
+            <tr>
+                <td>m4.large</td>
+                <td>2</td>
+                <td>8</td>
+                <td>4</td>
+            </tr>
+        </tbody>
+    </table>
+    &nbsp
+    &nbsp
+    &nbsp
+    <h2>Results of benchmarking using cloudwatch</h1>
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Metric name</th>
+                    <th>result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Request count</td>
+                    <td>
+                        <img src="{{ url_for('static', filename='metrics/request_count.png') }}" alt="" width="1000"
+                            height="250">
+                    </td>
+                </tr>
+                <tr>
+                    <td>Target respsone time of alb</td>
+                    <td>
+                        <img src="{{ url_for('static', filename='metrics/target_response_time_AZ.png') }}" alt=""
+                            width="1000" height="250">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Target respsone time of target groups</td>
+                    <td>
+                        <img src="{{ url_for('static', filename='metrics/target_response_time_TG.png') }}" alt=""
+                            width="1000" height="250">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>CPU usage</td>
+                    <td>
+                        <img src="{{ url_for('static', filename='metrics/cpuutilization.png') }}" alt="" width="1000"
+                            height="250">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>networking usage</td>
+                    <td>
+                        <img src="{{ url_for('static', filename='metrics/networking.png') }}" alt="" width="1000"
+                            height="250">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</body>
+
+</html>
