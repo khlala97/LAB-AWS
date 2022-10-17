@@ -3,7 +3,7 @@ set -e
 source utils/cli_helper.sh
 
 function setup {
-    if [[ -f "backup.txt" ]]; then
+    if [[ -f "keypair.pem" ]]; then
         rm -f keypair.pem
     fi
 
@@ -19,16 +19,16 @@ function setup {
 
     echo "Launch EC2 instances..."
     for i in {1..4}; do
-        t2 = $(launch_ec2_instance $SUBNETS_1 "t2.large")
-        m4 = $(launch_ec2_instance $SUBNETS_2 "m4.large")
+        t2=$(launch_ec2_instance $SUBNETS_1 "t2.large")
+        m4=$(launch_ec2_instance $SUBNETS_2 "m4.large")
         CLUSTER_ONE_INSTANCES+=("$t2")
         CLUSTER_TWO_INSTANCES+=("$m4")
     done
     #Launch the 9th instance
-    t2 = $(launch_ec2_instance $SUBNETS_1 "t2.large")
+    t2=$(launch_ec2_instance $SUBNETS_1 "t2.large")
     CLUSTER_ONE_INSTANCES+=("$t2")
-    echo "CLUSTER_ONE_INSTANCES=\"$CLUSTER_ONE_INSTANCES\"" >>backup.txt
-    echo "CLUSTER_TWO_INSTANCES=\"$CLUSTER_TWO_INSTANCES\"" >>backup.txt
+    echo "CLUSTER_ONE_INSTANCES=\"${CLUSTER_ONE_INSTANCES[@]}\"" >>backup.txt
+    echo "CLUSTER_TWO_INSTANCES=\"${CLUSTER_TWO_INSTANCES[@]}\"" >>backup.txt
     echo "Done"
 
     #Setup the load balancer configs
